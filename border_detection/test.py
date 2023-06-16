@@ -49,9 +49,16 @@ mu_opt, sigma_opt, A_opt, D_opt = popt
 x_fit = np.linspace(1, red_data.shape[0], 100)
 y_fit = normal_dist(x_fit, mu_opt, sigma_opt, A_opt, D_opt)
 
+# Perform the curve fitting for the polynomial
+degree = 2  # Specify the degree of the polynomial
+coefficients = np.polyfit(y_value, red_data[:, 200], degree)
+poly_func = np.poly1d(coefficients)
+y_fit_poly = poly_func(x_fit)
+
 # Plot the original data and the fitted curve
 plt.plot(y_value, red_data[:, 200], label='Column 200')
 plt.plot(x_fit, y_fit, 'r-', label='Fitted Normal Distribution')
+plt.plot(x_fit, y_fit_poly, 'g-', label='Fitted Polynomial')
 plt.xlabel('Y Value (Image Height)')
 plt.ylabel('Pixel Value')
 plt.title('Pixel Value vs. Y Value')
