@@ -3,12 +3,13 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from astropy.io import fits
 
-image = Image.open("/home/npark/Desktop/naomipark_mirsi/feb_28_sample.png")
-data = asarray(image)
-red_data = data[:,:,0] #transforms 'data' into a 2D array;
-#access red value only for each pixel
+# image = Image.open("/home/npark/Desktop/naomipark_mirsi/feb_28_sample.png")
+# data = asarray(image)
+# red_data = data[:,:,0] #transforms 'data' into a 2D array;
+# #access red value only for each pixel
 
-im = fits.open('/home/npark/Desktop/naomipark_mirsi/jds.229.a.fits.gz') #this works too!
+im = fits.open('/home/npark/Desktop/naomipark_mirsi/cal_jcf.043054.gz') #this works too!
+red_data = im[0].data #i believe this accesses pixel values of each image
 
 # print(red_data.shape)
 # print(red_data)
@@ -26,12 +27,7 @@ for i in range(len(red_data[:, 150])):
 print(y_value)
 
 fig1 = plt.figure(1)
-plt.imshow(image) #display original feb 28 image in in dimensions of (282, 365)
-
-# for i in range(red_data.shape[0]):
-#     for j in range(red_data.shape[1]):
-#         r_value = red_data[i,j]
-#         plt.text(j,i,str(r_value), color='black', fontsize=6, ha='center', va='center')
+plt.imshow(im[0].data) #display original feb 28 image in in dimensions of (282, 365)
 
 plt.show()
 
