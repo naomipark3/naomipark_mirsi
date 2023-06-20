@@ -19,19 +19,33 @@ def mean_column(image): #will take in "im" as argument
 def finite_difference_second_order(b):
     return np.pad(np.diff(b,2), (1,1), 'edge')
 
-# Euler-Lagrange PDE numerical approximator
+'''The correction function is designed to iteratively solve the Euler-Lagrange equation
+via the use of a numerical method to approximate solution.
+The term 'zxx - b_old_xx + lambda_ * b_old' is the LHS of my Euler-Lagrange equation.
+correlation() tries to drive quantity (zxx - b_old_xx + lambda_ * b_old) towards zero by updating
+the bias term in a direction that reduces this quantity (see [Eq. 6] for the implementation).
+
+The equation that we're solving is designed to find an optimal bias 'b' that, when
+subtracted from the observed image, minimizes the difference between neighboring columns
+of the corrected image.
+
+'''
 def correction(b_old, z, del_t, lambda_, lambda_tv):
     z_xx = finite_difference_second_order(z)
     b_old_xx = finite_difference_second_order(b_old)
     tv_term = np.pad(np.diff(b_old), (1,0), 'constant')
     return b_old - del_t * (z_xx - b_old_xx + lambda_ * b_old + lambda_tv * tv_term) #see [Eq. 6] from article (with TV term)
+    #this is the numerical approximation for the new bias 'b' (implementation of a
+    #gradient descent step)
+    #**NOTE: total variation is a regularization term that encourages the resulting image
+    #to have less high-frequency noise and more piecewise-constant regions
 
-def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.00001, lambda_tv=0.1):
+def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.00001, lambda_tv=1):
     z = mean_column(image)
     b = init_bias
     for i in range(niters):
         b = correction(b, z, del_t, lambda_, lambda_tv)
-    corrected_image = image - b
+    corrected_image = image - b #see [Eq. 7]
     return corrected_image, b
 
 
