@@ -19,7 +19,8 @@ def mean_column(image): #will take in "im" as argument
 def finite_difference_second_order(b):
     return np.pad(np.diff(b,2), (1,1), 'edge')
 
-'''The correction function is designed to iteratively solve the Euler-Lagrange equation
+'''
+The correction function is designed to iteratively solve the Euler-Lagrange equation
 via the use of a numerical method to approximate solution.
 The term 'zxx - b_old_xx + lambda_ * b_old' is the LHS of my Euler-Lagrange equation.
 correlation() tries to drive quantity (zxx - b_old_xx + lambda_ * b_old) towards zero by updating
@@ -40,14 +41,24 @@ def correction(b_old, z, del_t, lambda_, lambda_tv):
     #**NOTE: total variation is a regularization term that encourages the resulting image
     #to have less high-frequency noise and more piecewise-constant regions
 
+'''
+'b' represents the estimated bias (i.e. offset or distortion) from the true value of each column
+These biases are manifest as stripe noise. 
+'''
 def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.00001, lambda_tv=1):
     z = mean_column(image)
     b = init_bias
+
+    '''in iteration, 'b' is updated to better estimate the bias of each column based on 'correction()'
+    '''
     for i in range(niters):
         b = correction(b, z, del_t, lambda_, lambda_tv)
+    
+    ''' 'b' is subtracted from original image to correct for NU
+    (i.e. subtraction makes the image more like its unbiased state)
+    '''
     corrected_image = image - b #see [Eq. 7]
     return corrected_image, b
-
 
 def normalize(image):
     return image / np.max(image)
