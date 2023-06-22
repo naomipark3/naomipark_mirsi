@@ -1,1 +1,0 @@
-# naomipark_mirsi
