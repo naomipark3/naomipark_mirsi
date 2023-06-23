@@ -23,7 +23,7 @@ if gray_jpg is None:
     print("Failed to load image")
 else:
     # Try to find circles in the image
-    detected_circle = cv2.HoughCircles(gray_jpg, cv2.HOUGH_GRADIENT, 150, 40, param1 = 30, param2 = 100, minRadius=30, maxRadius=200)
+    detected_circle = cv2.HoughCircles(gray_jpg, cv2.HOUGH_GRADIENT, 145, 40, param1 = 30, param2 = 100, minRadius=50, maxRadius=150)
     #150 yields best results so far
     #changing num of votes doesn't do anything
 
