@@ -1,18 +1,38 @@
+import cv2
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 from astropy.io import fits
 import alphashape
 
-im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/cal_jcf.043054.gz') #reads in fits file
+im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/wjup.00059.a.fits.gz') #reads in fits file
 red_data = im[0].data #i believe this accesses pixel values of each image (not entirely sure what this means though???)
 #data is in the form of I (erg/s/cm^2/ster/cm^-1)
 print("original image: ", red_data[:, 200])
 
 fig1 = plt.figure(1)
-plt.imshow(im[0].data[:, 125:150])
+plt.imshow(im[0].data)
 plt.title("Original Image")
 plt.show()
+
+#computes gradient of a given column
+# def find_jumps(column, factor=5): #factor is the number of standard deviations 
+#     #a change in gradient needs to exceed to be considered a "jump"
+#     grad = np.gradient(column)
+#     threshold = factor*np.std(grad)
+#     jumps = np.abs(grad) > threshold
+#     return jumps
+
+# jumps = np.apply_along_axis(find_jumps, 0, red_data)
+# jump_coordinates = np.column_stack(np.where(jumps))
+# plt.scatter(jump_coordinates[:,1], jump_coordinates[:,0], color='red', s=1)
+# plt.title('Jump Coordinates')
+# plt.show()
+
+# def find_jump():
+#     for col in red_data.shape[1]:
+#         for row in red_data.shape[0]:
+#             if red_data[row][col] >=
 
 def mean_column(image): #will take in "im" as argument
     return np.mean(image, axis=0)
@@ -32,13 +52,9 @@ subtracted from the observed image, minimizes the difference between neighboring
 of the corrected image.
 
 '''
-def correction(b_old, z, del_t, lambda_, lambda_tv):
+def correction(b_old, z, del_t, lambda_):
     z_xx = finite_difference_second_order(z)
     b_old_xx = finite_difference_second_order(b_old)
-    tv_term = np.pad(np.diff(b_old), (1,0), 'constant') #**NOTE: total variation is a regularization term that encourages the resulting image
-    #to have less high-frequency noise and more piecewise-constant regions
-    #this will probably not help because you we want to IGNORE the piece in the middle instead of trying to account for it
-
     return b_old - del_t * (z_xx - b_old_xx + lambda_ * b_old) #see [Eq. 6] from article (with TV term)
     #this is the numerical approximation for the new bias 'b' (implementation of a
     #gradient descent step)
@@ -47,14 +63,14 @@ def correction(b_old, z, del_t, lambda_, lambda_tv):
 'b' represents the estimated bias (i.e. offset or distortion) from the true value of each column
 These biases are manifest as stripe noise. 
 '''
-def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.01, lambda_tv=1):
+def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.01):
     z = mean_column(image)
     b = init_bias
 
     '''in iteration, 'b' is updated to better estimate the bias of each column based on 'correction()'
     '''
     for i in range(niters):
-        b = correction(b, z, del_t, lambda_, lambda_tv)
+        b = correction(b, z, del_t, lambda_)
     
     ''' 'b' is subtracted from original image to correct for NU
     (i.e. subtraction makes the image more like its unbiased state)
@@ -63,13 +79,12 @@ def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.01, lambd
     return corrected_image, b
 
 
-initial_bias = np.zeros(red_data[:, 125:150].shape[1]) #.shape returns a tuple that represents size, so .shape[1] helps us to access the columns
-corrected_image, estimated_bias = stripe_noise_correction(red_data[:, 125:150], initial_bias, del_t=0.01, niters=1000) #set timestep equal to 0.1 and niters=100 for now
+initial_bias = np.zeros(red_data.shape[1]) #.shape returns a tuple that represents size, so .shape[1] helps us to access the columns
+corrected_image, estimated_bias = stripe_noise_correction(red_data, initial_bias, del_t=0.01, niters=1000) #set timestep equal to 0.1 and niters=100 for now
 # corrected_image = denormalize(corrected_image, original_max)
 
-fig2 = plt.figure(2)
+fig3 = plt.figure(3)
 plt.imshow(corrected_image)
 plt.title("Corrected Image")
 print()
-# print("corrected image: ", corrected_image[:, 200])
 plt.show()
