@@ -14,7 +14,7 @@ plt.title("Original Image")
 plt.show()
 
 # Load the image in grayscale
-gray_jpg = cv2.imread('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/noise_removal/jup_output.jpg', cv2.IMREAD_GRAYSCALE)
+gray_jpg = cv2.imread('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/jup_output.jpg', cv2.IMREAD_GRAYSCALE)
 
 # cv2.imshow("gray jpg", gray_jpg)
 # cv2.waitKey(0)
