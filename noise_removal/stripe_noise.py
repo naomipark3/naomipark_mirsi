@@ -63,9 +63,10 @@ def mean_column(image, coordinate_list, radius): # Will take in "im" and "coordi
         if a-r <= j <= a+r: # If the column contains part of the planet
             upper_boundary = b - r
             lower_boundary = b + r
-            above_planet = image[:upper_boundary, j]
+            above_planet = image[:upper_boundary, j] #slices image array to get all the rows above the upper boundary of the planet
             below_planet = image[lower_boundary+1:, j]
-            mean = np.mean(np.concatenate([above_planet, below_planet]))
+            mean = np.mean(np.concatenate([above_planet, below_planet])) #concatenate pixel values from above_planet and below_planet
+            #into a single array and calculate the mean of those values
         else:
             mean = np.mean(image[:, j])
         means.append(mean)
