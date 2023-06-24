@@ -16,15 +16,17 @@ plt.show()
 # Load the image in grayscale
 gray_jpg = cv2.imread('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/noise_removal/jup_output.jpg', cv2.IMREAD_GRAYSCALE)
 
-cv2.imshow("gray jpg", gray_jpg)
-cv2.waitKey(0)
+# cv2.imshow("gray jpg", gray_jpg)
+# cv2.waitKey(0)
+plt.imshow(gray_jpg, cmap='gray')
+plt.show()
+
 # Ensure the image was loaded properly
 if gray_jpg is None:
     print("Failed to load image")
 else:
     # Try to find circles in the image
     detected_circle = cv2.HoughCircles(gray_jpg, cv2.HOUGH_GRADIENT, 145, 40, param1 = 30, param2 = 100, minRadius=50, maxRadius=150)
-    #150 yields best results so far
     #changing num of votes doesn't do anything
 
 print(detected_circle)
@@ -34,9 +36,10 @@ if detected_circle is not None:
     # Convert the circle parameters a, b and r to integers.
     detected_circles = np.uint16(np.around(detected_circle))
   
+    coordinate_list = []
     for pt in detected_circles[0, :]:
         a, b, r = pt[0], pt[1], pt[2]
-  
+        coordinate_list.append((a,b))
         # Draw the circumference of the circle.
         cv2.circle(gray_jpg, (a, b), r, (0, 255, 0), 2)
   
