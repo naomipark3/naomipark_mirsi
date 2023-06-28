@@ -1,14 +1,10 @@
-import cv2
 import numpy as np
-from PIL import Image
 import matplotlib.pyplot as plt
 from astropy.io import fits
-import alphashape
 
-im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/wjup.00059.a.fits.gz') #reads in fits file
-red_data = im[0].data #i believe this accesses pixel values of each image (not entirely sure what this means though???)
+im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/wjup.00226.b.fits.gz') #reads in fits file
+red_data = im[0].data
 #data is in the form of I (erg/s/cm^2/ster/cm^-1)
-print("original image: ", red_data[:, 200])
 
 fig1 = plt.figure(1)
 plt.imshow(im[0].data)
@@ -36,7 +32,7 @@ of the corrected image.
 def correction(b_old, z, del_t, lambda_):
     z_xx = finite_difference_second_order(z)
     b_old_xx = finite_difference_second_order(b_old)
-    return b_old - del_t * (z_xx - b_old_xx + lambda_ * b_old) #see [Eq. 6] from article (with TV term)
+    return b_old - del_t * (z_xx - b_old_xx + lambda_ * b_old) #see [Eq. 6] from article
     #this is the numerical approximation for the new bias 'b' (implementation of a
     #gradient descent step)
 
@@ -44,7 +40,7 @@ def correction(b_old, z, del_t, lambda_):
 'b' represents the estimated bias (i.e. offset or distortion) from the true value of each column
 These biases are manifest as stripe noise. 
 '''
-def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.01):
+def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.1):
     z = mean_column(image)
     b = init_bias
 
@@ -62,7 +58,6 @@ def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.01):
 
 initial_bias = np.zeros(red_data.shape[1]) #.shape returns a tuple that represents size, so .shape[1] helps us to access the columns
 corrected_image, estimated_bias = stripe_noise_correction(red_data, initial_bias, del_t=0.01, niters=1000) #set timestep equal to 0.1 and niters=100 for now
-# corrected_image = denormalize(corrected_image, original_max)
 
 fig3 = plt.figure(3)
 plt.imshow(corrected_image)

@@ -16,8 +16,6 @@ plt.show()
 # Load the image in grayscale
 gray_jpg = cv2.imread('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/jup_output.jpg', cv2.IMREAD_GRAYSCALE)
 
-# cv2.imshow("gray jpg", gray_jpg)
-# cv2.waitKey(0)
 plt.imshow(gray_jpg, cmap='gray')
 plt.show()
 
