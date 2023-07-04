@@ -11,7 +11,7 @@ img2 = np.load('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/border_d
 plt.imshow(img2)
 plt.show()
 
-img3 = np.load('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/border_detection/dataset/train/1088.npy')
+img3 = np.load('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/border_detection/dataset/train/1085.npy')
 plt.imshow(img3)
 plt.show()
 
