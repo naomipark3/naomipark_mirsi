@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
 
-im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/wjup.00226.b.fits.gz') #reads in fits file
+im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/wjup.00059.a.fits.gz') #reads in fits file
 red_data = im[0].data
 #data is in the form of I (erg/s/cm^2/ster/cm^-1)
 
@@ -15,7 +15,8 @@ def mean_column(image): #will take in "im" as argument
     return np.mean(image, axis=0)
 
 def finite_difference_second_order(b):
-    return np.pad(np.diff(b,2), (1,1), 'edge')
+    diff = np.diff(b, 2)
+    return np.concatenate(([0], diff, [0]))
 
 '''
 The correction function is designed to iteratively solve the Euler-Lagrange equation
@@ -57,10 +58,15 @@ def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.1):
 
 
 initial_bias = np.zeros(red_data.shape[1]) #.shape returns a tuple that represents size, so .shape[1] helps us to access the columns
-corrected_image, estimated_bias = stripe_noise_correction(red_data, initial_bias, del_t=0.01, niters=1000) #set timestep equal to 0.1 and niters=100 for now
+# corrected_image, estimated_bias = stripe_noise_correction(red_data, initial_bias, del_t=0.01, niters=1000) #set timestep equal to 0.1 and niters=100 for now
 
+for i in range(20):
+    corrected_image, estimated_bias = stripe_noise_correction(red_data, initial_bias, del_t=0.01, niters=1000)
+    red_data = corrected_image
+    initial_bias = estimated_bias
+
+#show image after algorithm has been run x number of times
 fig3 = plt.figure(3)
 plt.imshow(corrected_image)
-plt.title("Corrected Image")
-print()
+plt.title("Corrected Image (20X)")
 plt.show()
