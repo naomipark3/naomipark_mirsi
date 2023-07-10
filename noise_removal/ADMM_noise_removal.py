@@ -2,16 +2,25 @@ import numpy as np
 from astropy.io import fits
 import matplotlib.pyplot as plt
 import imageio
+import cv2
 
-im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/wjup.00059.a.fits.gz') 
+im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/data/wjup.00059.a.fits.gz') 
 data = im[0].data
 
-M = data.shape[0] #rows
-N = data.shape[1] #cols
-fig1 = plt.figure(1)
-plt.imshow(im[0].data)
-plt.title("Original Image")
+
+plt.imsave('ADMM_jup.jpg', data)
+
+
+# Load the image in grayscale
+gray_jpg = cv2.imread('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/data/minus_edge_padding.jpg', cv2.IMREAD_GRAYSCALE)
+#returns a numpy array
+
+M = gray_jpg.shape[0] #rows
+N = gray_jpg.shape[1] #cols
+
+plt.imshow(gray_jpg, cmap='gray')
 plt.show()
+cv2.imwrite('grayscale_cleaned.jpg', gray_jpg)
 
 def prox_absolute_value(z):
     out = 0
@@ -125,7 +134,7 @@ def ADMM(x, t, myepsilon):
     return y_k, niter
 
 
-x = data / 255.0 #not sure if this needs to be scaled, but we'll leave it for now
+x = gray_jpg / 255.0 #not sure if this needs to be scaled/if scaling makes a difference
 myepsilon = 10 ** (-2)
 
 for t in range(5, 45, 5):
@@ -135,6 +144,8 @@ for t in range(5, 45, 5):
         plt.imshow(y_ki)
         plt.title("Denoised Image")
         plt.show()
+        print("showing")
+        exit()
 
 
 

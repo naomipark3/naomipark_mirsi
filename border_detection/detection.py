@@ -4,7 +4,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from astropy.io import fits
 
-im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/cal_jcf.043054.gz') #reads in fits file
+im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/data/cal_jcf.043054.gz') #reads in fits file
 red_data = im[0].data #i believe this accesses pixel values of each image (not entirely sure what this means though???)
 #data is in the form of I (erg/s/cm^2/ster/cm^-1)
 fig1 = plt.figure(1)

@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
+import cv2
 
-im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/wjup.00059.a.fits.gz') #reads in fits file
+im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/data/wjup.00059.a.fits.gz') #reads in fits file
 red_data = im[0].data
 #data is in the form of I (erg/s/cm^2/ster/cm^-1)
 
@@ -70,3 +71,7 @@ fig3 = plt.figure(3)
 plt.imshow(corrected_image)
 plt.title("Corrected Image (20X)")
 plt.show()
+plt.imsave("corrected_img.jpg", corrected_image)
+grayscale_img = cv2.imread("corrected_img.jpg", cv2.IMREAD_GRAYSCALE)
+cv2.imwrite("clean_grayscale.jpg", grayscale_img) #save grayscale image
+#so it can be used in the ADMM
