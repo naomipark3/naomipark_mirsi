@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
 import cv2
+from scipy.signal import convolve2d
+
 
 im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/data/wjup.00226.b.fits.gz') #reads in fits file
 red_data = im[0].data
@@ -62,6 +64,27 @@ def finite_difference_second_order(b):
         for j in range(col_num):
             diff[:, j] = np.concatenate(([0], np.diff(b[:, j], 2), [0]))
         return diff
+'''
+The stripe_noise_detection function detects regions with stripe noise.
+It does so by computing the absolute second derivative and then 
+smoothing it with a Gaussian filter. Regions where the smoothed second 
+derivative exceeds a threshold are considered as containing stripe noise.
+'''
+def stripe_noise_detection(image, kernel_size=5, threshold=0.05):
+    # Compute the second order finite difference
+    diff = np.abs(finite_difference_second_order(image))
+
+    # Create a Gaussian kernel
+    kernel = cv2.getGaussianKernel(kernel_size, 0)
+    kernel_2d = np.outer(kernel, kernel.transpose())
+
+    # Convolve the difference image with the Gaussian kernel
+    smoothed = convolve2d(diff, kernel_2d, mode='same', boundary='symm')
+
+    # Create a binary mask where the smoothed difference exceeds the threshold
+    mask = smoothed > threshold
+
+    return mask
 
 '''
 The correction function is designed to iteratively solve the Euler-Lagrange equation
@@ -85,6 +108,25 @@ def correction(b_old, z, del_t, lambda_):
     return b_old - del_t * (z_xx - b_old_xx + lambda_ * b_old) #see [Eq. 6] from article
     #this is the numerical approximation for the new bias 'b' (implementation of a
     #gradient descent step)
+
+def local_correction(image, init_bias, del_t, niters, lambda_=0.1, window_size=None):
+    # Detect regions with stripe noise
+    mask = stripe_noise_detection(image)
+
+    # Only consider pixels within the stripe noise regions for bias estimation
+    masked_image = np.where(mask, image, 0)
+
+    # Perform stripe noise correction as before, but only on the masked image
+    z = mean_column(masked_image, window_size)
+    b = init_bias
+
+    for i in range(niters):
+        b = correction(b, z, del_t, lambda_)
+
+    # Apply the correction only within the stripe noise regions
+    corrected_image = np.where(mask, image - b, image)
+
+    return corrected_image, b
 
 '''
 'b' represents the estimated bias (i.e. offset or distortion) from the true value of each column
@@ -114,15 +156,11 @@ def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.1, window
 
 
 initial_bias = np.zeros(red_data.shape[1]) #.shape returns a tuple that represents size, so .shape[1] helps us to access the columns
-# corrected_image, estimated_bias = stripe_noise_correction(red_data, initial_bias, del_t=0.01, niters=1000) #set timestep equal to 0.1 and niters=100 for now
 
-for i in range(10): #we run the stripe noise removal algorithm 20 times (no window size)
+for i in range(20): #we run the stripe noise removal algorithm 20 times (no window size)
     corrected_image, estimated_bias = stripe_noise_correction(red_data, initial_bias, del_t=0.01, niters=1000)
     red_data = corrected_image
     initial_bias = estimated_bias
-
-for i in range(10): #we run the stripe noise removal algorithm with a window size 50 times
-    corrected_image, estimated_bias = stripe_noise_correction(corrected_image, estimated_bias, del_t=0.01, niters=1000, window_size=50)
 
 #show image after algorithm has been run x number of times
 fig3 = plt.figure(3)
