@@ -4,17 +4,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from astropy.io import fits
 
-im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/data/cal_jcf.043054.gz') #reads in fits file
-red_data = im[0].data #i believe this accesses pixel values of each image (not entirely sure what this means though???)
-#data is in the form of I (erg/s/cm^2/ster/cm^-1)
-fig1 = plt.figure(1)
-plt.imshow(im[0].data)
-plt.savefig('jup_output.jpg')
-plt.title("Original Image")
-plt.show()
-
 # Load the image in grayscale
-gray_jpg = cv2.imread('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/jup_output.jpg', cv2.IMREAD_GRAYSCALE)
+gray_jpg = cv2.imread('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/corrected_img.jpg', cv2.IMREAD_GRAYSCALE)
 
 plt.imshow(gray_jpg, cmap='gray')
 plt.show()
@@ -23,8 +14,13 @@ plt.show()
 if gray_jpg is None:
     print("Failed to load image")
 else:
+    #apply Otsu's thresholding
+    ret, thresh = cv2.threshold(gray_jpg, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     # Try to find circles in the image
-    detected_circle = cv2.HoughCircles(gray_jpg, cv2.HOUGH_GRADIENT, 145, 40, param1 = 30, param2 = 100, minRadius=50, maxRadius=150)
+    plt.imshow(thresh)
+    plt.show()
+    #detected_circle = cv2.HoughCircles(thresh, cv2.HOUGH_GRADIENT, 2, 40, param1 = ret, param2 = ret, minRadius=50, maxRadius=150)
+    detected_circle = cv2.HoughCircles(thresh, cv2.HOUGH_GRADIENT, 1, 100, param1 = 100, param2 = 30, minRadius=30, maxRadius=100)
     #changing num of votes doesn't do anything
 
 print(detected_circle)
@@ -39,7 +35,7 @@ if detected_circle is not None:
         a, b, r = pt[0], pt[1], pt[2]
         coordinate_list.append((a,b))
         # Draw the circumference of the circle.
-        cv2.circle(gray_jpg, (a, b), r, (0, 255, 0), 2)
+        cv2.circle(gray_jpg, (a, b), r, (0, 255, 0), 2) #last parameter is equivalent to thickness.
   
         # Draw a small circle (of radius 1) to show the center.
         cv2.circle(gray_jpg, (a, b), 1, (0, 0, 255), 3)
