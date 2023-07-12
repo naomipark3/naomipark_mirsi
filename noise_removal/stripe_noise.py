@@ -19,8 +19,24 @@ of the image.
 @return: numpy array where each index contains the mean value of one
 column in the image.
 '''
-def mean_column(image): #will take in "im" as argument
-    return np.mean(image, axis=0)
+def mean_column(image, window_size=None): 
+    if window_size is None:
+        #if no window size specified, return mean of the entire column
+        return np.mean(image, axis=0)
+    else:
+        #if a window size is specified, compute windowed means
+        row_num, col_num = image.shape
+        means = np.zeros((row_num, col_num))
+        half_window = window_size // 2
+
+        for i in range(row_num):
+            #determine the start and end indices for the window
+            start = max(0, i - half_window)
+            end = min(row_num, i + half_window)
+            #compute the mean over the window
+            means[i, :] = np.mean(image[start:end, :], axis=0)
+
+        return means
 
 '''
 The finite_difference_second_order function computes the second-order finite 
@@ -35,8 +51,17 @@ is preserved by padding a zero on either end. The second-order finite difference
 as a numpy array.
 '''
 def finite_difference_second_order(b):
-    diff = np.diff(b, 2)
-    return np.concatenate(([0], diff, [0]))
+    if b.ndim == 1:
+        # If the input is a 1D array, compute the second order finite difference as before
+        diff = np.diff(b, 2)
+        return np.concatenate(([0], diff, [0]))
+    else:
+        # If the input is a 2D array, compute the second order finite difference for each column
+        row_num, col_num = b.shape
+        diff = np.zeros((row_num, col_num))
+        for j in range(col_num):
+            diff[:, j] = np.concatenate(([0], np.diff(b[:, j], 2), [0]))
+        return diff
 
 '''
 The correction function is designed to iteratively solve the Euler-Lagrange equation
@@ -72,8 +97,8 @@ These biases are manifest as stripe noise.
 @return: corrected_image -- denoised image, returned as a numpy array of intensity values.
 @return: b -- updated estimate of the bias in each column, returned as a numpy array. 
 '''
-def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.1):
-    z = mean_column(image)
+def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.1, window_size=None):
+    z = mean_column(image, window_size)
     b = init_bias
 
     '''in iteration, 'b' is updated to better estimate the bias of each column based on 'correction()'
@@ -91,10 +116,13 @@ def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.1):
 initial_bias = np.zeros(red_data.shape[1]) #.shape returns a tuple that represents size, so .shape[1] helps us to access the columns
 # corrected_image, estimated_bias = stripe_noise_correction(red_data, initial_bias, del_t=0.01, niters=1000) #set timestep equal to 0.1 and niters=100 for now
 
-for i in range(20): #we run the stripe noise removal algorithm 20 times
+for i in range(10): #we run the stripe noise removal algorithm 20 times (no window size)
     corrected_image, estimated_bias = stripe_noise_correction(red_data, initial_bias, del_t=0.01, niters=1000)
     red_data = corrected_image
     initial_bias = estimated_bias
+
+for i in range(10): #we run the stripe noise removal algorithm with a window size 50 times
+    corrected_image, estimated_bias = stripe_noise_correction(corrected_image, estimated_bias, del_t=0.01, niters=1000, window_size=50)
 
 #show image after algorithm has been run x number of times
 fig3 = plt.figure(3)
