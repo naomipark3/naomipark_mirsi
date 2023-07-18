@@ -87,6 +87,15 @@ def stripe_noise_correction(image, init_bias, del_t, niters, lambda_=0.1):
     corrected_image = image - b #see [Eq. 7]
     return corrected_image, b
 
+'''
+process_fits_file() is a function that takes in the file path to an uncleaned
+image and corrects it using the stripe noise removal algorithm. The initial bias
+is estimated using the shape of the original image, and the stripes are removed through
+a call to stripe_noise_correction(). Once the image has been corrected, it is placed in
+a user-specified directory (corrected_image_directory) and assigned a name based on its directory.
+This function is called iteratively below so that each image in a directory can be automatically 
+corrected without additional user-guidance.
+'''
 def process_fits_file(file_path):
     im = fits.open(file_path)
     red_data = im[0].data
@@ -130,14 +139,15 @@ def process_fits_file(file_path):
     # plt.show()
 
 
-#specify your path
+#specify path of the directory that contains uncleaned images.
 path = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/11_70/'
 
-#lines 117-122 will be run for images in a folder for each wavelength of interest
+'''lines 117-122 will be run on all images in a specified directory (each directory
+contains MIRSI images taken at different wavelengths).'''
 #get list of all .fits.gz files in the directory
 fits_files = [f for f in os.listdir(path) if f.endswith('.fits.gz')]
 
-#process all files
+#process and correct all images in a directory via a call to the process_fits_file() function.
 for file in fits_files:
     full_file_path = os.path.join(path, file)
     process_fits_file(full_file_path)
