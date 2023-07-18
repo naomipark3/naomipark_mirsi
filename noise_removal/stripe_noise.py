@@ -120,6 +120,16 @@ def process_fits_file(file_path):
     # save the corrected image to the new path
     plt.imsave(corrected_image_path, corrected_image)
 
+    # # compute the difference image
+    # difference_image = red_data - corrected_image
+
+    # # plot the difference image
+    # plt.figure()
+    # plt.imshow(difference_image)
+    # plt.title(f"Difference Image - {file_path}")
+    # plt.show()
+
+
 #specify your path
 path = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/11_70/'
 
