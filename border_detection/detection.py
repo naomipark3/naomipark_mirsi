@@ -19,7 +19,6 @@ else:
     # Try to find circles in the image
     plt.imshow(thresh)
     plt.show()
-    #detected_circle = cv2.HoughCircles(thresh, cv2.HOUGH_GRADIENT, 2, 40, param1 = ret, param2 = ret, minRadius=50, maxRadius=150)
     detected_circle = cv2.HoughCircles(thresh, cv2.HOUGH_GRADIENT, 1, 100, param1 = 100, param2 = 30, minRadius=30, maxRadius=100)
     #changing num of votes doesn't do anything
 
