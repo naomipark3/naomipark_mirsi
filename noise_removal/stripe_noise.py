@@ -95,6 +95,7 @@ a call to stripe_noise_correction(). Once the image has been corrected, it is pl
 a user-specified directory (corrected_image_directory) and assigned a name based on its directory.
 This function is called iteratively below so that each image in a directory can be automatically 
 corrected without additional user-guidance.
+@param: file_path -- the path to the image that needs to be corrected.
 '''
 def process_fits_file(file_path):
     im = fits.open(file_path)
