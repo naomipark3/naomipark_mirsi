@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
-import cv2
 import os
+import gzip
+import shutil
 
 im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/data/wjup.00059.a.fits.gz') #reads in fits file
 #data is in the form of I (erg/s/cm^2/ster/cm^-1)
@@ -98,57 +99,58 @@ corrected without additional user-guidance.
 @param: file_path -- the path to the image that needs to be corrected.
 '''
 def process_fits_file(file_path):
-    im = fits.open(file_path)
-    red_data = im[0].data
+    # Open the FITS file
+    with fits.open(file_path) as hdulist:
+        # Save the header information
+        original_header = hdulist[0].header
+        # Save the image data
+        red_data = hdulist[0].data
 
-    initial_bias = np.zeros(red_data.shape[1]) #.shape returns a tuple that represents size, so .shape[1] helps us to access the columns
+    initial_bias = np.zeros(red_data.shape[1]) # .shape returns a tuple that represents size, so .shape[1] helps us to access the columns
 
-    for i in range(20): #we run the stripe noise removal algorithm 20 times
+    for i in range(20): # we run the stripe noise removal algorithm 20 times
         corrected_image, estimated_bias = stripe_noise_correction(red_data, initial_bias, del_t=0.01, niters=1000)
         red_data = corrected_image
         initial_bias = estimated_bias
 
-    #show image after algorithm has been run x number of times
+    # Show image after algorithm has been run x number of times
     fig1 = plt.figure(1)
     plt.imshow(corrected_image)
     plt.title(f"Corrected Image (20X) - {file_path}")
     plt.show()
 
-    #define a new path for the corrected images
+    # Define a new path for the corrected images
     corrected_image_directory = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/11_70_corrected_images'
     
-    #ensure the new directory exists, if not, create it
+    # Ensure the new directory exists, if not, create it
     if not os.path.exists(corrected_image_directory):
         os.makedirs(corrected_image_directory)
-
-    # create a new filename for the corrected image
-    corrected_image_filename = os.path.splitext(os.path.basename(file_path))[0] + '_corrected.jpg'
     
-    # create the full path to the new file by joining the new directory with the new filename
+    # Create a new filename for the corrected image
+    corrected_image_filename = os.path.splitext(os.path.basename(file_path))[0] + '_corrected.fits'
+
+    # Create the full path to the new file by joining the new directory with the new filename
     corrected_image_path = os.path.join(corrected_image_directory, corrected_image_filename)
+
+    # Save the corrected image to the new path with the original header
+    fits.writeto(corrected_image_path, corrected_image, header=original_header, overwrite=True)
     
-    # save the corrected image to the new path
-    plt.imsave(corrected_image_path, corrected_image)
-
-    # # compute the difference image
-    # difference_image = red_data - corrected_image
-
-    # # plot the difference image
-    # plt.figure()
-    # plt.imshow(difference_image)
-    # plt.title(f"Difference Image - {file_path}")
-    # plt.show()
+    # Compress the FITS file
+    with open(corrected_image_path, 'rb') as f_in:
+        with gzip.open(corrected_image_path + '.gz', 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+    
+    # Remove the uncompressed file
+    os.remove(corrected_image_path)
 
 
-#specify path of the directory that contains uncleaned images.
+# Specify path of the directory that contains uncleaned images
 path = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/11_70/'
 
-'''lines 117-122 will be run on all images in a specified directory (each directory
-contains MIRSI images taken at different wavelengths).'''
-#get list of all .fits.gz files in the directory
+# Get list of all .fits.gz files in the directory
 fits_files = [f for f in os.listdir(path) if f.endswith('.fits.gz')]
 
-#process and correct all images in a directory via a call to the process_fits_file() function.
+# Process and correct all images in a directory via a call to the process_fits_file() function
 for file in fits_files:
     full_file_path = os.path.join(path, file)
     process_fits_file(full_file_path)
