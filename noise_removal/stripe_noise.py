@@ -5,14 +5,6 @@ import os
 import gzip
 import shutil
 
-im = fits.open('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/data/wjup.00059.a.fits.gz') #reads in fits file
-#data is in the form of I (erg/s/cm^2/ster/cm^-1)
-
-# fig1 = plt.figure(1)
-# plt.imshow(im[0].data)
-# plt.title("Original Image")
-# plt.show()
-
 ''''
 The mean_column function calculates the mean value for each column
 of the image. 
@@ -120,7 +112,7 @@ def process_fits_file(file_path):
     plt.show()
 
     # Define a new path for the corrected images
-    corrected_image_directory = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/11_70_corrected_images'
+    corrected_image_directory = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/4_90_corrected_images'
     
     # Ensure the new directory exists, if not, create it
     if not os.path.exists(corrected_image_directory):
@@ -132,7 +124,7 @@ def process_fits_file(file_path):
     # Create the full path to the new file by joining the new directory with the new filename
     corrected_image_path = os.path.join(corrected_image_directory, corrected_image_filename)
 
-    # Save the corrected image to the new path with the original header
+    # Save the corrected image to the new path with the original header (original header must be preserved in order to coadd image and run NEMESIS)
     fits.writeto(corrected_image_path, corrected_image, header=original_header, overwrite=True)
     
     # Compress the FITS file
@@ -145,7 +137,7 @@ def process_fits_file(file_path):
 
 
 # Specify path of the directory that contains uncleaned images
-path = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/11_70/'
+path = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/4_90/'
 
 # Get list of all .fits.gz files in the directory
 fits_files = [f for f in os.listdir(path) if f.endswith('.fits.gz')]
