@@ -96,19 +96,31 @@ def process_fits_file(file_path):
         # Save the header information
         original_header = hdulist[0].header
         # Save the image data
-        red_data = hdulist[0].data
+        original_data = hdulist[0].data
 
-    initial_bias = np.zeros(red_data.shape[1]) # .shape returns a tuple that represents size, so .shape[1] helps us to access the columns
+    initial_bias = np.zeros(original_data.shape[1]) # .shape returns a tuple that represents size, so .shape[1] helps us to access the columns
 
+    red_data = original_data
     for i in range(20): # we run the stripe noise removal algorithm 20 times
         corrected_image, estimated_bias = stripe_noise_correction(red_data, initial_bias, del_t=0.01, niters=1000)
         red_data = corrected_image
         initial_bias = estimated_bias
 
-    # Show image after algorithm has been run x number of times
+    #Show image after algorithm has been run x number of times
     fig1 = plt.figure(1)
     plt.imshow(corrected_image)
     plt.title(f"Corrected Image (20X) - {file_path}")
+    plt.colorbar()
+    plt.show()
+
+    # compute the difference image
+    difference_image = original_data - corrected_image
+
+    # plot the difference image
+    plt.figure()
+    plt.imshow(difference_image)
+    plt.title(f"Difference Image - {file_path}")
+    plt.colorbar()
     plt.show()
 
     # Define a new path for the corrected images
