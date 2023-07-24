@@ -6,7 +6,7 @@ from astropy.io import fits
 
 # Load the image in grayscale
 gray_jpg = cv2.imread('/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/corrected_img.jpg', cv2.IMREAD_GRAYSCALE)
-
+gray_jpg = gray_jpg[20:225, :]
 plt.imshow(gray_jpg, cmap='gray')
 plt.show()
 
@@ -19,7 +19,8 @@ else:
     # Try to find circles in the image
     plt.imshow(thresh)
     plt.show()
-    detected_circle = cv2.HoughCircles(thresh, cv2.HOUGH_GRADIENT, 1, 100, param1 = 100, param2 = 30, minRadius=30, maxRadius=100)
+    #needed to tune params from: (thresh, cv2.HOUGH_GRADIENT, 1, 100, 100, 30, 30, 100)
+    detected_circle = cv2.HoughCircles(thresh, cv2.HOUGH_GRADIENT, 1, 1000, param1 = 15, param2 = 7, minRadius=30, maxRadius=100)
     #changing num of votes doesn't do anything
 
 print(detected_circle)

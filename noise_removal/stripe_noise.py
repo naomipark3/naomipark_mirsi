@@ -107,24 +107,24 @@ def process_fits_file(file_path):
         initial_bias = estimated_bias
 
     #Show image after algorithm has been run x number of times
-    fig1 = plt.figure(1)
-    plt.imshow(corrected_image)
-    plt.title(f"Corrected Image (20X) - {file_path}")
-    plt.colorbar()
-    plt.show()
+    # fig1 = plt.figure(1)
+    # plt.imshow(corrected_image)
+    # plt.title(f"Corrected Image (20X) - {file_path}")
+    # plt.colorbar()
+    # plt.show()
 
-    # compute the difference image
-    difference_image = original_data - corrected_image
+    # # compute the difference image
+    # difference_image = original_data - corrected_image
 
-    # plot the difference image
-    plt.figure()
-    plt.imshow(difference_image)
-    plt.title(f"Difference Image - {file_path}")
-    plt.colorbar()
-    plt.show()
+    # # plot the difference image
+    # plt.figure()
+    # plt.imshow(difference_image)
+    # plt.title(f"Difference Image - {file_path}")
+    # plt.colorbar()
+    # plt.show()
 
     # Define a new path for the corrected images
-    corrected_image_directory = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/4_90_corrected_images'
+    corrected_image_directory = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/9_80_corrected_images'
     
     # Ensure the new directory exists, if not, create it
     if not os.path.exists(corrected_image_directory):
@@ -149,7 +149,7 @@ def process_fits_file(file_path):
 
 
 # Specify path of the directory that contains uncleaned images
-path = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/4_90/'
+path = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/9_80/'
 
 # Get list of all .fits.gz files in the directory
 fits_files = [f for f in os.listdir(path) if f.endswith('.fits.gz')]
