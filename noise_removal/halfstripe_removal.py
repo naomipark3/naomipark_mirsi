@@ -161,5 +161,10 @@ fig3 = plt.figure(3)
 plt.imshow(corrected_image)
 plt.title("Corrected Image (1X)")
 plt.show()
-hdu = fits.PrimaryHDU(corrected_image)
-hdu.writeto("halfstripe_corrected.fits")
+
+with fits.open("/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/data/cal_jcf02410243.gz") as hdulist:
+    # Save the header information
+    original_header = hdulist[0].header
+# Save the corrected image to the new path with the original header (original header must be preserved in order to coadd image and run NEMESIS)
+corrected_image_filled = corrected_image.filled(fill_value=0)  # replace masked data with zeros
+fits.writeto("halfstripe_removed.fits", corrected_image_filled, header=original_header, overwrite=True)

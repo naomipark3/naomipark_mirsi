@@ -124,7 +124,7 @@ def process_fits_file(file_path):
     # plt.show()
 
     # Define a new path for the corrected images
-    corrected_image_directory = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/9_80_corrected_images'
+    corrected_image_directory = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/june_22/18_40_corrected_images'
     
     # Ensure the new directory exists, if not, create it
     if not os.path.exists(corrected_image_directory):
@@ -149,7 +149,7 @@ def process_fits_file(file_path):
 
 
 # Specify path of the directory that contains uncleaned images
-path = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/9_80/'
+path = '/Users/naomipark/Desktop/jpl_internship/naomipark_mirsi/june_22/18_40'
 
 # Get list of all .fits.gz files in the directory
 fits_files = [f for f in os.listdir(path) if f.endswith('.fits.gz')]
