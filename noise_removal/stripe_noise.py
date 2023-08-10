@@ -107,12 +107,17 @@ def process_fits_file(file_path):
         initial_bias = estimated_bias
 
     #Show image after algorithm has been run x number of times
-    # fig1 = plt.figure(1)
-    # plt.imshow(corrected_image)
-    # plt.title(f"Corrected Image (20X) - {file_path}")
-    # plt.colorbar()
-    # plt.show()
+    fig1 = plt.figure(1)
+    plt.imshow(corrected_image)
+    plt.title(f"Corrected Image (20X) - {file_path}")
+    plt.colorbar()
+    plt.show()
 
+    '''
+    The following code that is commented out plots the difference between
+    the original image as an image. The output should be an image solely 
+    containing vertical stripes.
+    '''
     # # compute the difference image
     # difference_image = original_data - corrected_image
 
