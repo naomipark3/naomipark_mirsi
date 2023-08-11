@@ -118,7 +118,8 @@ def process_fits_file(file_path):
     the original image as an image. The output should be an image solely 
     containing vertical stripes.
     '''
-    # # compute the difference image
+    # code compute the difference image (i.e. the difference between the original and the
+    # corrected image, which should manifest itself as a series of stripes) is commented out here: 
     # difference_image = original_data - corrected_image
 
     # # plot the difference image
