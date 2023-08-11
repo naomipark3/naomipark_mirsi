@@ -6,6 +6,8 @@ TABLE OF CONTENTS:
 2. DESCRIPTION OF RECOMMENDED FUTURE WORK
 
 
+
+
 DESCRIPTION OF ALL FOLDERS AND FILES IN THIS REPOSITORY:
 
 **border_detection**:
@@ -23,6 +25,10 @@ DESCRIPTION OF ALL FOLDERS AND FILES IN THIS REPOSITORY:
 **noise_removal**:
     **stripe_noise_indiv.py**: The stripe noise correction algorithm implemented in this code is designed to remove stripe noise artifacts from FITS images, common in astronomical data. It operates by calculating the mean value for each column of the image and then applying a second-order finite difference to identify the bias or distortion in each column. The core of the algorithm is an iterative numerical method, where a correction function applies gradient descent to update the bias term, driving the optimization process. The algorithm balances between constraint and smoothness terms and iteratively refines the estimated biases, subtracting them from the original image to achieve a denoised result. Contact naomi_park@brown.edu for a more detailed description of the theory and design behind the stripe noise removal algorithm. stripe_noise_indiv.py takes in a single image from the "data" folder and performs the algorithm on that one image. stripe_noise_indiv.py displays the original image (before stripe removal) at the start of the algorithm, and then it displays corrected image (after stripe noise removal) once the algorithm has been performed 20 times. We note that the header information of the image is NOT preserved in stripe_noise_indiv.py, as this script is primarily for visualization and visual testing purposes.  
     **stripe_noise_directory.py**: This file performs the exact same algorithm detailed in the description of stripe_noise_indiv.py above. However, instead of taking in a single image, this file takes in a directory of images. As a result, this file is more practical when we need to denoise hundreds of image after a MIRSI observing run. For example, I was able to "automatically" feed all images taken at the 4.90 micron filter on June 21st (which is the 4_90 folder within june_21) into the algorithm with the stripe_noise_directory.py file. It does so with the process_fits_file(path) method, which enables the user to specify a folder of images to destripe with the "path" variable at the end of the stripe_noise_directory.py script. The user can also specify a name and path for the corrected images to go in with the "corrected_image_path" variable. All destriped images will be dumped into the folder specified in "corrected_image_path," and each destriped image will be assigned the name: <original_image_name>_corrected.fits so that the FITS file format is preserved. Finally, unlike the stripe_noise_indiv.py file, the header data of each image is preserved (i.e. carried on to the destriped image) so that we can run the additional necessary reduction techniques on each destriped image.   
+
+
+
+
 
 DESCRIPTION OF RECOMMENDED FUTURE WORK:
 
