@@ -34,3 +34,4 @@ Our stripe noise removal algorithm calculates the bias in each column readout ci
 **Running more trials of NEMESIS**: MIRSI was refurbished a few years ago, and the current version of NEMESIS assumes the older construction of MIRSI. We do not yet have the filter functions based on the new construction of MIRSI, but once these filter functions have been created, we may find more groundbreaking results by running additional NEMESIS trials (note: files needed for running NEMESIS are not included in this repo). 
 
 
+![Screenshot](/Users/naomipark/Desktop/jpl_internship/Screen Shot 2023-08-16 at 9.46.43 AM.png)
